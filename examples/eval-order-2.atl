@@ -1,0 +1,38 @@
+;; The arguments to the outer `prn` should normally be evaluated from
+;; left to right, but we bind a new interpreter which reverses the
+;; argument list before evaluating them and then reverses the result
+;; before invoking the function.
+
+;; Should print the args individually, then three nils, then return
+;; nil.
+
+;; 3
+;; 2
+;; 1
+;; nil nil nil
+;; => nil
+
+;; @TODO: thi will be muhc nicer if/when we have structral eiting of
+;; the interpreter
+
+(bind (*i* (qu (fn [e env]
+                 (if-not (coll? e)
+                   (if (symbol? e)
+                     (get env e)
+                     e)
+                   (case (first e)
+                     qu (second e)
+                     bind (let [bindings (partition 2 (second e))]
+                            (evaluate (nth e 2)
+                                      (reduce (fn [acc-env [n v]]
+                                                (assoc acc-env n (evaluate v acc-env)))
+                                              env
+                                              bindings)))
+                     ;; reverse before and after evaluating args to funcall.
+                     (->> (rest e)
+                          reverse
+                          (map (fn [arg] (evaluate arg env)))
+                          reverse
+                          (apply (evaluate (first e)))))))))
+
+      (prn (prn 1) (prn 2) (prn 3)))
