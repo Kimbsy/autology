@@ -1,5 +1,48 @@
 (ns autology.core
-  (:gen-class))
+  (:gen-class)
+  (:require [clojure.walk :refer [postwalk]]))
+
+;; If we 'mark' our forms in the interpreter with qualified keywords we can use these as references for modifying it.
+(def example-i '(:atl/outer
+                (fn
+                  [e env]
+                  (:atl/coll-switch
+                   (if-not
+                       (coll? e)
+                     (:atl/scalar-branch
+                      (if
+                          (symbol? e)
+                        (:atl/symbol-branch (get env e))
+                        (:atl/self-evaluating e)))
+                     ;; @TODO: do the whole initial-interpreter
+                     (:atl/coll-branch (other e)))))))
+
+;; We can supply a new value for the content of any marker
+(defn replace-marker
+  [interpreter marker new-marker-form]
+  (postwalk
+   (fn [expr]
+     (if (and (list? expr)
+              (= marker (first expr)))
+       (list marker new-marker-form)
+       expr))
+   interpreter))
+
+;; We can remove all the markers before evaluating the interpreter
+(defn strip-markers [e]
+  (if (list? e)
+    (if (and (keyword? (first e))
+             (= "atl" (namespace (first e))))
+      (first (map strip-markers (rest e)))
+      (map strip-markers e))
+    e))
+
+;; @TODO: try this for real, clean up a bit
+
+
+
+
+
 
 ;; Uses of `evaluate` in this definition refer to the function
 ;; `autology.core/evaluate` defined below which will get the
