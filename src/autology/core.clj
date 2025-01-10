@@ -37,7 +37,7 @@
       (map strip-markers e))
     e))
 
-;; @TODO: try this for real, clean up a bit
+;; @TODO: try this for real, clean up a bit, get them in the initial environment so we can use them from within autology
 
 
 
@@ -48,9 +48,13 @@
 ;; `autology.core/evaluate` defined below which will get the
 ;; interpreter from the execution environment.
 ;;
+;; We bind `*ns*` to be `autology.core` so we ensure we're able to
+;; access it regardless of how autology is run (REPL, script, jar
+;; etc).
+;;
 ;; We want to keep this interpreter fully defined in this one
-;; expression, no named functions, that way it's easy to modify from
-;; within an autology program.
+;; expression, no named functions, only lambdas, that way it's easy to
+;; modify from within an autology program.
 (def initial-interpreter
   '(fn [e env]
      (if-not (coll? e)
@@ -68,11 +72,12 @@
          ;; environment
 
          bind (let [bindings (partition 2 (second e))]
-                (evaluate (nth e 2)
-                          (reduce (fn [acc-env [n v]]
-                                    (assoc acc-env n (evaluate v acc-env)))
-                                  env
-                                  bindings)))
+                (evaluate
+                 (nth e 2)
+                 (reduce (fn [acc-env [n v]]
+                           (assoc acc-env n (evaluate v acc-env)))
+                         env
+                         bindings)))
 
          ;; default to function application
          (apply (evaluate (first e))
@@ -117,14 +122,13 @@
     (flush)
     (prn (evaluate (read-string (read-line))))))
 
-;; @TODO: this doesn't seem to be working properly when passing in a filename
 (defn -main
   [& args]
-  (prn args)
-  (if args
-    (prn (eval-file (first args)))
+  (binding [*ns* (the-ns 'autology.core)]
+    (if args
+      (prn (eval-file (first args)))
 
-    (do
-      (print "repl:\n")
-      (flush)
-      (repl))))
+      (do
+        (print "repl:\n")
+        (flush)
+        (repl)))))
