@@ -56,18 +56,38 @@
                     (map (fn [arg] (evaluate arg env))
                          (rest e)))))))))))
 
-(defn replace-marker
-  "Replace the contents of a marked section of an interpreter with a new
-  expression.
+(defn strip-markers
+  "Remove all the `:atl/foo` markers from a interpreter data
+  structure."
+  [e]
+  (if (list? e)
+    (if (and (keyword? (first e))
+             (= "atl" (namespace (first e))))
+      (first (map strip-markers (rest e)))
+      (map strip-markers e))
+    e))
 
-  ;; @TODO: do we want this behaviour? we might be drasticallly changing the expression, the orginal marker might not make sense? I reckon change it, the user can add in the new marker, or we could have a flag/opt-arg?
-  The new section will be wrapped in the existing marker."
-  [interpreter marker new-marker-form]
+(defn get-marker
+  "Get the expression wrapped by the specified `:atl/foo` marker."
+  [expr marker]
+  (if (list? expr)
+    (if (= marker (first expr))
+      (second expr)
+      (first (keep #(get-marker % marker) (rest expr))))
+    nil))
+
+(defn replace-marker
+  "Replace the contents of a marked expression in an interpreter with a
+  new expression.
+
+  The new expression will not be wrapped in the existing marker, since
+  that marker might want to be renamed or even removed."
+  [interpreter marker new-expression]
   (postwalk
    (fn [expr]
      (if (and (list? expr)
               (= marker (first expr)))
-       (list marker new-marker-form)
+       new-expression
        expr))
    interpreter))
 
@@ -84,23 +104,13 @@
    'concat concat
 
    ;; Interpreter-editing utils
+   'strip-markers strip-markers
+   'get-marker get-marker
    'replace-marker replace-marker
-   ;; @TODO: add get-marker? so we can bind it and work on it more easily?
 
    ;; the autology interpreter
    '*i*
    initial-interpreter})
-
-;; We can remove all the markers before evaluating the interpreter
-(defn strip-markers
-  "Remove all the `:atl/foo` markers from a interpreter data structure."
-  [e]
-  (if (list? e)
-    (if (and (keyword? (first e))
-             (= "atl" (namespace (first e))))
-      (first (map strip-markers (rest e)))
-      (map strip-markers e))
-    e))
 
 (defn evaluate
   "Grab the interpreter out of the execution environment, strip all
