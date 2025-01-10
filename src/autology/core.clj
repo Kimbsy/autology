@@ -29,7 +29,7 @@
          (:atl/eval-atom
           (if (symbol? e)
             (get env e)
-            (:atl/self-evaluating e)))
+            (:atl/literal e)))
          ;; evaluate a list
          (:atl/eval-list
           (case (first e)

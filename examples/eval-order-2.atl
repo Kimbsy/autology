@@ -1,23 +1,29 @@
-;; The arguments to the outer `prn` should normally be evaluated from
-;; left to right, but we bind a new interpreter which reverses the
-;; argument list before evaluating them and then reverses the result
-;; before invoking the function.
+;; The arguments to the `+` call would normally be evaluated from left
+;; to right, but we replace the function application part of the
+;; interpreter with a version which reverses the argument list before
+;; evaluating them and then re-reverses the evaluated arguments before
+;; invoking the function (so that non-commutative operations like
+;; division work the same).
 
-;; Should print the args individually, then three nils, then return
-;; nil.
+;; Our literal-printing interpreter modification will once again print
+;; the arguments in the order they're evaluated, in this case from
+;; right to left, before returning the answer.
 
-;; 3
-;; 2
-;; 1
-;; nil nil nil
-;; => nil
+;; 24
+;; 7
+;; 11
+;; => 42
 
 (bind (*i* (replace-marker
             *i* :atl/function-application
-            (qu (->> (rest e)
-                     reverse
-                     (map (fn [arg] (evaluate arg env)))
-                     reverse
-                     (apply (evaluate (first e)))))))
+            (qu (:atl/reverse-order-application
+                 (->> (rest e)
+                      reverse
+                      (map (fn [arg] (evaluate arg env)))
+                      reverse
+                      (apply (evaluate (first e)))))))
+       *i* (replace-marker
+            *i* :atl/literal
+            (qu (:atl/printing-literal (second (list (prn e) e))))))
 
-      (prn (prn 1) (prn 2) (prn 3)))
+      (+ 11 7 24))
