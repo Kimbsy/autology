@@ -1,0 +1,6 @@
+;; Simple function declaration and invocation in Scheme.
+
+(with-*i* :scheme
+  (define (double x) (* x 2))
+  (double 21)
+  )

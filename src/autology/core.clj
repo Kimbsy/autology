@@ -7,6 +7,13 @@
 ;; @TODO: we want some easy `with-*i*` function/special form to allow us to switch between existing interpreters.
 
 
+;; @TODO: THIS! VVVVV
+;; @TODO: we need to write interpreters for our inter-lingual examples.
+;; @TODO: THIS! ^^^^^
+
+
+
+;; @NOTE: theoretically you could dump random bytes into a file, then manipulate autology's interpreter to recognise that file as a program that solves any problem. you could even have a single random file and two interpreters which both recognise it as a valid program that solve different problems!
 
 
 ;; Uses of `evaluate` in this definition refer to the function

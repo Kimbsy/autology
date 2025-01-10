@@ -1,0 +1,15 @@
+;; Printing and for loops in C!
+
+(with-*i* :c
+  printf("Hello World!\n");
+
+  int x = 0;
+  for (int i = 13;
+       i <= 15;
+       i++)
+  {
+    x += i;
+  }
+
+  return x;
+  )

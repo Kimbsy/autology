@@ -1,0 +1,8 @@
+;; Calculating the product of a NumPy array in Python.
+
+(with-*i* :python
+  import numpy as np
+
+  arr = np.array([6, 7])
+  return np.prod(arr)
+  )
