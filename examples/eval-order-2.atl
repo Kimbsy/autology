@@ -12,27 +12,12 @@
 ;; nil nil nil
 ;; => nil
 
-;; @TODO: thi will be muhc nicer if/when we have structral eiting of
-;; the interpreter
-
-(bind (*i* (qu (fn [e env]
-                 (if-not (coll? e)
-                   (if (symbol? e)
-                     (get env e)
-                     e)
-                   (case (first e)
-                     qu (second e)
-                     bind (let [bindings (partition 2 (second e))]
-                            (evaluate (nth e 2)
-                                      (reduce (fn [acc-env [n v]]
-                                                (assoc acc-env n (evaluate v acc-env)))
-                                              env
-                                              bindings)))
-                     ;; reverse before and after evaluating args to funcall.
-                     (->> (rest e)
-                          reverse
-                          (map (fn [arg] (evaluate arg env)))
-                          reverse
-                          (apply (evaluate (first e)))))))))
+(bind (*i* (replace-marker
+            *i* :atl/function-application
+            (qu (->> (rest e)
+                     reverse
+                     (map (fn [arg] (evaluate arg env)))
+                     reverse
+                     (apply (evaluate (first e)))))))
 
       (prn (prn 1) (prn 2) (prn 3)))
