@@ -115,9 +115,14 @@
    'get-marker get-marker
    'replace-marker replace-marker
 
-   ;; the autology interpreter
+   ;; The Autology interpreter
    '*i*
-   initial-interpreter})
+   initial-interpreter
+
+   ;; Other available interpreters
+   c-interpreter 
+
+   })
 
 (defn evaluate
   "Grab the interpreter out of the execution environment, strip all
@@ -128,6 +133,7 @@
   ([e env]
    ((eval (strip-markers (get env '*i*))) e env)))
 
+;; @TODO: read-string isn't going to work when we're dealing with other languages.
 (def eval-string (comp evaluate read-string))
 
 (defn eval-file
