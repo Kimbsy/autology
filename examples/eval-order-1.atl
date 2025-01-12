@@ -5,13 +5,13 @@
 ;; the expression before evaluating it. This prints the arguments in
 ;; the order they're evaluated before returning the answer.
 
-;; 11
-;; 7
-;; 24
+;; 1
+;; 2
+;; 39
 ;; => 42
 
 (bind (*i* (replace-marker
             *i* :atl/literal
             (qu (:atl/printing-literal (second (list (prn e) e))))))
 
-      (+ 11 7 24))
+      (+ 1 2 39))

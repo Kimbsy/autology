@@ -9,9 +9,9 @@
 ;; the arguments in the order they're evaluated, in this case from
 ;; right to left, before returning the answer.
 
-;; 24
-;; 7
-;; 11
+;; 39
+;; 2
+;; 1
 ;; => 42
 
 (bind (*i* (replace-marker
@@ -26,4 +26,4 @@
             *i* :atl/literal
             (qu (:atl/printing-literal (second (list (prn e) e))))))
 
-      (+ 11 7 24))
+      (+ 1 2 39))

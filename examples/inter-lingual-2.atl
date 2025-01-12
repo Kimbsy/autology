@@ -1,6 +1,6 @@
 ;; Calculating the product of a NumPy array in Python.
 
-(with-*i* :python
+(with-*i* autology.interpreters.python/evaluate
   import numpy as np
 
   arr = np.array([6, 7])

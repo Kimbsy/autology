@@ -1,18 +1,7 @@
 (ns autology.interpreters.c
-  (:require [clojure.string :as s]
-            [autology.interpreters.c :as c]))
+  (:require [clojure.string :as s]))
 
 (declare evaluate)
-
-(def example
-  "printf(\"Hello World!\n\");
-
-int x = 0;
-for (int i = 13; i < 16; i++) {
-  x = x + i;
-}
-
-return x;")
 
 (def clean-str (comp s/trim #(apply str %)))
 
@@ -43,66 +32,66 @@ return x;")
           (recur (conj subs sub-expr) remaining))))))
 
 (defn eval-arithmetic
-  [state expr]
+  [env expr]
   ;; only allows 2 variables, good enough
   (let [[a op b] (map read-string (s/split expr #" "))
         a-val (if (symbol? a)
-                (get state (keyword a))
+                (get env (keyword a))
                 a)
         b-val (if (symbol? b)
-                (get state (keyword b))
+                (get env (keyword b))
                 b)]
     ((eval op) a-val b-val)))
 
 (defn eval-for
-  [state expr]
+  [env expr]
   (let [[_ pre body] (re-find #"(?s)for \((.*?)\) \{(.*?)\}" expr)
         ;; assuming step is always ++
         [init condition _step] (map clean-str (s/split pre #";"))
         [sym-str val-str] (map clean-str (s/split init #"="))
         sym (keyword (last (s/split sym-str #" ")))
         init-val (read-string val-str)
-        init-state (assoc state sym init-val)
+        init-env (assoc env sym init-val)
         sentinel-val (read-string (last (s/split condition #" ")))
         vals (range init-val sentinel-val)]
 
-    (reduce (fn [acc-state i-val]
-              (evaluate (assoc acc-state sym i-val) body))
-            init-state
+    (reduce (fn [acc-env i-val]
+              (evaluate body (assoc acc-env sym i-val)))
+            init-env
             vals)))
 
 (defn eval-printf
-  [state expr]
+  [env expr]
   (let [content (last (re-find #"(?s)printf\(\"(.*)\"\)" expr))]
     (print content)
-    state))
+    env))
 
 (defn eval-assignment
-  [state expr]
+  [env expr]
   (let [[l r] (map clean-str (s/split expr #"="))
         sym (last (s/split l #" "))
         val (if (re-matches #"\d+\.?\d*" r)
               (read-string r)
-              (eval-arithmetic state r))]
-    (assoc state (keyword sym) val)))
+              (eval-arithmetic env r))]
+    (assoc env (keyword sym) val)))
 
 (defn eval-return
-  [state expr]
+  [env expr]
   (let [ret-expr (clean-str (s/replace expr #"return" ""))]
     (if (= 1 (count (s/split ret-expr #" ")))
       (if (re-matches #"\d+\.?\d*" ret-expr)
         (read-string ret-expr)
-        (get state (keyword ret-expr)))
-      (eval-arithmetic state ret-expr))))
+        (get env (keyword ret-expr)))
+      (eval-arithmetic env ret-expr))))
 
 (defn evaluate
-  [state expr]
+  [expr env]
   ;; Start by splitting it up into chunks. We probably want to do
   ;; this greedily. Select up to the next semicolon unless the line
   ;; starts with `for` in which case select up to the closing brace.
   (let [sub-exprs (c-split expr)]
-    ;; then we want to have some initial state, and reduce evaluating
-    ;; the sub-expressions over the state.
+    ;; then we want to have some initial env, and reduce evaluating
+    ;; the sub-expressions over the env.
     (reduce (fn [acc sub-expr]
               (cond
                 ;; if the expression starts with `for` then we're
@@ -119,7 +108,7 @@ return x;")
 
                 ;; if the expression contains an `=` then we're doing
                 ;; an assignment, so we should add/update a variable
-                ;; in our state.
+                ;; in our env.
                 (re-find #"=" sub-expr)
                 (eval-assignment acc sub-expr)
 
@@ -128,5 +117,5 @@ return x;")
                 ;; resulting value.
                 (s/starts-with? sub-expr "return")
                 (eval-return acc sub-expr)))
-            state
+            env
             sub-exprs)))

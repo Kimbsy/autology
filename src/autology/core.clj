@@ -1,20 +1,46 @@
 (ns autology.core
   (:gen-class)
-  (:require [clojure.walk :refer [postwalk]]))
+  (:require [autology.interpreters.c :as c]
+            [autology.interpreters.python :as python]
+            [autology.interpreters.scheme :as scheme]
+            [clojure.string :as s]
+            [clojure.walk :refer [postwalk]]))
 
+(defn wrap-unsafe
+  "Takes an autology program as a string.
 
-
-;; @TODO: we want some easy `with-*i*` function/special form to allow us to switch between existing interpreters.
-
-
-;; @TODO: THIS! VVVVV
-;; @TODO: we need to write interpreters for our inter-lingual examples.
-;; @TODO: THIS! ^^^^^
-
-
-
-;; @NOTE: theoretically you could dump random bytes into a file, then manipulate autology's interpreter to recognise that file as a program that solves any problem. you could even have a single random file and two interpreters which both recognise it as a valid program that solve different problems!
-
+  Returns a version where the potentially unsafe bodies of any
+  `with-*i*` expressions are wrapped in strings. This version should
+  be safe to `clojure.core/read-string`."
+  [input-expr]
+  (loop [out []
+         [h & tail :as expr] input-expr]
+    (if (s/blank? expr)
+      (apply str out)
+      (if (s/starts-with? expr "(with-*i*")
+        ;; we know out expression starts with a `(`, need to take chars
+        ;; till we get to balanced parens. Then return a clojure list of
+        ;; with-*i*, the interpreter symbol and a string of the body.
+        (let [[with-i remaining] (loop [with-i-expr []
+                                        open-parens 0
+                                        [h & tail] expr]
+                                   (if (#{\)} h)
+                                     (if (= 1 open-parens)
+                                       ;; done
+                                       [(apply str (conj with-i-expr h))
+                                        (apply str tail)]
+                                       ;; closing nested paren
+                                       (recur (conj with-i-expr h) (dec open-parens) tail))
+                                     (if (#{\(} h)
+                                       ;; opening new nested paren
+                                       (recur (conj with-i-expr h) (inc open-parens) tail)
+                                       ;; non-paren char
+                                       (recur (conj with-i-expr h) open-parens tail))))
+              [_with-i-sym interpreter body] (re-find #"(?s)\(with-\*i\*\s+(\S+)\s+((?:.|\n)*)\)" with-i)]
+          (recur (conj out (str "(with-*i* " interpreter " \"" (s/escape body {\" "\\\""}) "\")"))
+                 (apply str (drop (count with-i) expr))))
+        ;; otherwise, take a safe char
+        (recur (conj out h) (apply str tail))))))
 
 ;; Uses of `evaluate` in this definition refer to the function
 ;; `autology.core/evaluate` defined below which will get the
@@ -47,6 +73,11 @@
             ;; @TODO: need the func special form so we can start saving
             ;; our interpreter modification functions into the
             ;; environment
+
+            ;; Rebind the special *i* symbol to a predefined
+            ;; interpreter, then evaluate the body.
+            with-*i* (let [[interpreter body] (rest e)]
+                       (evaluate body (assoc env '*i* (eval interpreter))))
 
             bind (:atl/bind
                   (let [bindings (partition 2 (second e))]
@@ -116,12 +147,14 @@
    'replace-marker replace-marker
 
    ;; The Autology interpreter
-   '*i*
-   initial-interpreter
+   '*i* initial-interpreter
 
    ;; Other available interpreters
-   c-interpreter 
-
+   'c-interpreter c/evaluate
+   ;; @TODO: implement python
+   'python-interpreter python/evaluate
+   ;; @TODO: implement scheme
+   'scheme-interpreter scheme/evaluate
    })
 
 (defn evaluate
@@ -133,8 +166,12 @@
   ([e env]
    ((eval (strip-markers (get env '*i*))) e env)))
 
-;; @TODO: read-string isn't going to work when we're dealing with other languages.
-(def eval-string (comp evaluate read-string))
+(defn eval-string
+  [s]
+  (-> s
+      wrap-unsafe
+      read-string
+      evaluate))
 
 (defn eval-file
   [filename]
@@ -146,7 +183,7 @@
     (newline)
     (print "> ")
     (flush)
-    (prn (evaluate (read-string (read-line))))))
+    (prn (eval-string (read-line)))))
 
 (defn -main
   [& args]

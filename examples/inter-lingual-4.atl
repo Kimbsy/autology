@@ -2,24 +2,24 @@
 
 (+
 
- (with-*i* :scheme
+ (with-*i* autology.interpreters.scheme/evaluate
    (define (double x) (* x 2))
    (double 21)
    )
 
- (with-*i* :python
+ (with-*i* autology.interpreters.python/evaluate
    import numpy as np
    
    arr = np.array([6, 7])
    return np.prod(arr)
    )
 
- (with-*i* :c
+ (with-*i* autology.interpreters.c/evaluate
    printf("Hello World!\n");
    
    int x = 0;
    for (int i = 13; i < 16; i++) {
-     x += i;
+     x = x + i;
    }
    
    return x;
