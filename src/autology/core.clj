@@ -1,6 +1,7 @@
 (ns autology.core
   (:gen-class)
   (:require [autology.interpreters.c :as c]
+            [autology.interpreters.debug :as debug]
             [autology.interpreters.python :as python]
             [autology.interpreters.scheme :as scheme]
             [clojure.string :as s]
@@ -70,14 +71,16 @@
             ;; writing isn't seen as the clojure quote special form.
             qu (:atl/quote (second e))
 
-            ;; @TODO: need the func special form so we can start saving
-            ;; our interpreter modification functions into the
-            ;; environment
+            ;; @TODO: need the func special form so we can write
+            ;; meaningful programs.
 
             ;; Rebind the special *i* symbol to a predefined
             ;; interpreter, then evaluate the body.
             with-*i* (let [[interpreter body] (rest e)]
-                       (evaluate body (assoc env '*i* (eval interpreter))))
+                       ;; The `body` is a string at this point, the
+                       ;; interpreter is expected to handle this in an
+                       ;; appropriate way.
+                       (evaluate body (assoc env '*i* (get env interpreter))))
 
             bind (:atl/bind
                   (let [bindings (partition 2 (second e))]
@@ -90,7 +93,7 @@
             
             ;; default to function application
             (:atl/function-application
-             (apply (evaluate (first e))
+             (apply (evaluate (first e) env)
                     (map (fn [arg] (evaluate arg env))
                          (rest e)))))))))))
 
@@ -131,6 +134,7 @@
 
 (def initial-env
   {'+ +
+   '= =
    'prn prn
    'nth nth
    'last last
@@ -150,11 +154,12 @@
    '*i* initial-interpreter
 
    ;; Other available interpreters
-   'c-interpreter c/evaluate
+   '*debug* debug/evaluate
+   '*c* c/evaluate
    ;; @TODO: implement python
-   'python-interpreter python/evaluate
+   '*python* python/evaluate
    ;; @TODO: implement scheme
-   'scheme-interpreter scheme/evaluate
+   '*scheme* scheme/evaluate
    })
 
 (defn evaluate
@@ -183,6 +188,7 @@
     (newline)
     (print "> ")
     (flush)
+    ;; @TODO: could loop the `read-line` till we have balanced parens to allow multi-line expressions.
     (prn (eval-string (read-line)))))
 
 (defn -main

@@ -1,6 +1,6 @@
 ;; Printing and for loops in C!
 
-(with-*i* autology.interpreters.c/evaluate
+(with-*i* *c*
   printf("Hello World!\n");
 
   int x = 0;

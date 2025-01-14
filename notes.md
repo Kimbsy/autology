@@ -5,6 +5,8 @@ So we wrap the body of the `with-*i*` expression in a string (we need to remembe
 (looking at the for loop header being treated as a comment because we're using clojure syntax highlighting)
 > by the time we get to this semicolon we're not longer in kansas baby! we're in C! or at least our budget approximation of runtime simulated C.
 
+- mention that this is _not_ how you would normally interpret a C program, lexer, parser, compiler etc.
+
 
 > theoretically you could dump random bytes into a file, then manipulate autology's interpreter to recognise that file as a program that solves any problem. you could even have a single random file and two interpreters which both recognise it as a valid program that solve different problems!
 
