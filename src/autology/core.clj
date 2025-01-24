@@ -76,11 +76,12 @@
 
             ;; Rebind the special *i* symbol to a predefined
             ;; interpreter, then evaluate the body.
-            with-*i* (let [[interpreter body] (rest e)]
-                       ;; The `body` is a string at this point, the
-                       ;; interpreter is expected to handle this in an
-                       ;; appropriate way.
-                       (evaluate body (assoc env '*i* (get env interpreter))))
+            with-*i* (:atl/with-i
+                      (let [[interpreter body] (rest e)]
+                        ;; The `body` is a string at this point, the
+                        ;; interpreter is expected to handle this in an
+                        ;; appropriate way.
+                        (evaluate body (assoc env '*i* (get env interpreter)))))
 
             bind (:atl/bind
                   (let [bindings (partition 2 (second e))]
