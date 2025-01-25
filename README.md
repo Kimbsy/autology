@@ -1,4 +1,6 @@
-# autology
+# Autology
 
-A hot take on Lisp metaprogramming, `autology` is a Lisp with access
+A hot take on Lisp metaprogramming, `Autology` is a Lisp with access
 to its own interpreter.
+
+;; @TODO: improve readme

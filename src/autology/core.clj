@@ -81,21 +81,21 @@
                         ;; The `body` is a string at this point, the
                         ;; interpreter is expected to handle this in an
                         ;; appropriate way.
-                        (evaluate body (assoc env '*i* (get env interpreter)))))
+                        (autology.core/evaluate body (assoc env '*i* (get env interpreter)))))
 
             bind (:atl/bind
                   (let [bindings (partition 2 (second e))]
-                    (evaluate
+                    (autology.core/evaluate
                      (nth e 2)
                      (reduce (fn [acc-env [n v]]
-                               (assoc acc-env n (evaluate v acc-env)))
+                               (assoc acc-env n (autology.core/evaluate v acc-env)))
                              env
                              bindings))))
             
             ;; default to function application
             (:atl/function-application
-             (apply (evaluate (first e) env)
-                    (map (fn [arg] (evaluate arg env))
+             (apply (autology.core/evaluate (first e) env)
+                    (map (fn [arg] (autology.core/evaluate arg env))
                          (rest e)))))))))))
 
 (defn strip-markers
@@ -137,8 +137,9 @@
   {'+ +
    '= =
    'prn prn
-   'nth nth
+   'first first
    'last last
+   'nth nth
    'drop-last drop-last
    'reverse reverse
    'rest rest
@@ -168,7 +169,7 @@
   the markers out, evaluate it (as a Clojure function) and use it to
   evaluate the expression."
   ([e]
-   (evaluate e initial-env))
+   (autology.core/evaluate e initial-env))
   ([e env]
    ((eval (strip-markers (get env '*i*))) e env)))
 
