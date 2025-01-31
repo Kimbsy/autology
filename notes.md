@@ -10,7 +10,12 @@ So we wrap the body of the `with-*i*` expression in a string (we need to remembe
 - mention that this is _not_ how you would normally interpret a C program, lexer, parser, compiler etc.
 
 
+> So we have to `read-string` the new evaluator and pass it to eval. Yes I know that's not safe, but we're writing a language that can modify it's own interpretation, we're a good way past safe a this point.
+
+
 > theoretically you could dump random bytes into a file, then manipulate autology's interpreter to recognise that file as a program that solves any problem. you could even have a single random file and two interpreters which both recognise it as a valid program that solve different problems!
+
+> here we have one interpreter that's looking for a Lisp-like tree, here's another which is looking for a script-like sequence of imperative statements. here's one that takes a file of random bytes and uses it as a seed to generate music. Ok so that's not really a programming language right? that#s just a program that reads input data and does stuff with it ...... <they're the same picture.jpg>
 
 
 make funny joke about lambda days attendees maybe not being familiar with "for loops", describe them as a form of stateful imperative recursion.

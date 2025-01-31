@@ -1,9 +1,8 @@
 (ns autology.interpreters.c
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [autology.interpreters.common :refer [clean-str]]))
 
 (declare evaluate)
-
-(def clean-str (comp s/trim #(apply str %)))
 
 (defn split-for-expression
   [expr]
@@ -32,7 +31,7 @@
           (recur (conj subs sub-expr) remaining))))))
 
 (defn eval-arithmetic
-  [env expr]
+  [expr env]
   ;; only allows 2 variables, good enough
   (let [[a op b] (map read-string (s/split expr #" "))
         a-val (if (symbol? a)
@@ -44,7 +43,7 @@
     ((eval op) a-val b-val)))
 
 (defn eval-for
-  [env expr]
+  [expr env]
   (let [[_ pre body] (re-find #"(?s)for \((.*?)\) \{(.*?)\}" expr)
         ;; assuming step is always ++
         [init condition _step] (map clean-str (s/split pre #";"))
@@ -61,28 +60,28 @@
             vals)))
 
 (defn eval-printf
-  [env expr]
+  [expr env]
   (let [content (last (re-find #"(?s)printf\(\"(.*)\"\)" expr))]
     (print content)
     env))
 
 (defn eval-assignment
-  [env expr]
+  [expr env]
   (let [[l r] (map clean-str (s/split expr #"="))
         sym (last (s/split l #" "))
         val (if (re-matches #"\d+\.?\d*" r)
               (read-string r)
-              (eval-arithmetic env r))]
+              (eval-arithmetic r env))]
     (assoc env (keyword sym) val)))
 
 (defn eval-return
-  [env expr]
+  [expr env]
   (let [ret-expr (clean-str (s/replace expr #"return" ""))]
     (if (= 1 (count (s/split ret-expr #" ")))
       (if (re-matches #"\d+\.?\d*" ret-expr)
         (read-string ret-expr)
         (get env (keyword ret-expr)))
-      (eval-arithmetic env ret-expr))))
+      (eval-arithmetic ret-expr env))))
 
 (defn evaluate
   [expr env]
@@ -90,32 +89,31 @@
   ;; this greedily. Select up to the next semicolon unless the line
   ;; starts with `for` in which case select up to the closing brace.
   (let [sub-exprs (c-split expr)]
-    ;; then we want to have some initial env, and reduce evaluating
-    ;; the sub-expressions over the env.
+    ;; Reduce evaluating the sub-expressions over the env.
     (reduce (fn [acc sub-expr]
               (cond
-                ;; if the expression starts with `for` then we're
+                ;; If the expression starts with `for` then we're
                 ;; gonna need to deconstrut the for loop and do some
                 ;; recursion probably. We'll handle this first as it
                 ;; will likely also trigger other cond cases here.
                 (s/starts-with? sub-expr "for")
-                (eval-for acc sub-expr)
+                (eval-for sub-expr acc)
 
-                ;; if the expression starts with `printf` then we
+                ;; If the expression starts with `printf` then we
                 ;; need to do some printing.
                 (s/starts-with? sub-expr "printf")
-                (eval-printf acc sub-expr)
+                (eval-printf sub-expr acc)
 
-                ;; if the expression contains an `=` then we're doing
+                ;; If the expression contains an `=` then we're doing
                 ;; an assignment, so we should add/update a variable
                 ;; in our env.
                 (re-find #"=" sub-expr)
-                (eval-assignment acc sub-expr)
+                (eval-assignment sub-expr acc)
 
-                ;; if the expression starts with `return` then we
+                ;; If the expression starts with `return` then we
                 ;; know we're at the end and should return the
                 ;; resulting value.
                 (s/starts-with? sub-expr "return")
-                (eval-return acc sub-expr)))
+                (eval-return sub-expr acc)))
             env
             sub-exprs)))

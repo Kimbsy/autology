@@ -22,21 +22,22 @@
         ;; we know out expression starts with a `(`, need to take chars
         ;; till we get to balanced parens. Then return a clojure list of
         ;; with-*i*, the interpreter symbol and a string of the body.
-        (let [[with-i remaining] (loop [with-i-expr []
-                                        open-parens 0
-                                        [h & tail] expr]
-                                   (if (#{\)} h)
-                                     (if (= 1 open-parens)
-                                       ;; done
-                                       [(apply str (conj with-i-expr h))
-                                        (apply str tail)]
-                                       ;; closing nested paren
-                                       (recur (conj with-i-expr h) (dec open-parens) tail))
-                                     (if (#{\(} h)
-                                       ;; opening new nested paren
-                                       (recur (conj with-i-expr h) (inc open-parens) tail)
-                                       ;; non-paren char
-                                       (recur (conj with-i-expr h) open-parens tail))))
+        (let [[with-i remaining]
+              (loop [with-i-expr []
+                     open-parens 0
+                     [h & tail] expr]
+                (if (#{\)} h)
+                  (if (= 1 open-parens)
+                    ;; done
+                    [(apply str (conj with-i-expr h))
+                     (apply str tail)]
+                    ;; closing nested paren
+                    (recur (conj with-i-expr h) (dec open-parens) tail))
+                  (if (#{\(} h)
+                    ;; opening new nested paren
+                    (recur (conj with-i-expr h) (inc open-parens) tail)
+                    ;; non-paren char
+                    (recur (conj with-i-expr h) open-parens tail))))
               [_with-i-sym interpreter body] (re-find #"(?s)\(with-\*i\*\s+(\S+)\s+((?:.|\n)*)\)" with-i)]
           (recur (conj out (str "(with-*i* " interpreter " \"" (s/escape body {\" "\\\""}) "\")"))
                  (apply str (drop (count with-i) expr))))
@@ -158,7 +159,6 @@
    ;; Other available interpreters
    '*debug* debug/evaluate
    '*c* c/evaluate
-   ;; @TODO: implement python
    '*python* python/evaluate
    ;; @TODO: implement scheme
    '*scheme* scheme/evaluate
