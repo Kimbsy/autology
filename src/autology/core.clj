@@ -136,6 +136,7 @@
 
 (def initial-env
   {'+ +
+   '* *
    '= =
    'prn prn
    'first first
@@ -160,7 +161,6 @@
    '*debug* debug/evaluate
    '*c* c/evaluate
    '*python* python/evaluate
-   ;; @TODO: implement scheme
    '*scheme* scheme/evaluate
    })
 
