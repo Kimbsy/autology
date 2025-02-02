@@ -108,3 +108,7 @@
             (with-out-str
               (is (= 42 (eval-file (io/resource "examples/eval-order-1.atl")))))]
         (is (= "1\n2\n39\n" out))))))
+
+(deftest feature-add-test
+  (testing "we can add significantly complex features to the language"
+    (is (= 42.0 (eval-file (io/resource "examples/functions.atl"))))))

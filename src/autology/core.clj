@@ -72,9 +72,6 @@
             ;; writing isn't seen as the clojure quote special form.
             qu (:atl/quote (second e))
 
-            ;; @TODO: need the func special form so we can write
-            ;; meaningful programs.
-
             ;; Rebind the special *i* symbol to a predefined
             ;; interpreter, then evaluate the body.
             with-*i* (:atl/with-i
@@ -92,6 +89,9 @@
                                (assoc acc-env n (autology.core/evaluate v acc-env)))
                              env
                              bindings))))
+
+            ;; @TODO: need the func special form so we can write
+            ;; meaningful programs.
             
             ;; default to function application
             (:atl/function-application
@@ -103,7 +103,7 @@
   "Remove all the `:atl/foo` markers from a interpreter data
   structure."
   [e]
-  (if (list? e)
+  (if (seq? e)
     (if (and (keyword? (first e))
              (= "atl" (namespace (first e))))
       (first (map strip-markers (rest e)))
@@ -142,7 +142,7 @@
    'first first
    'last last
    'nth nth
-   'drop-last drop-last
+   'butlast butlast
    'reverse reverse
    'rest rest
    'conj conj
@@ -161,8 +161,7 @@
    '*debug* debug/evaluate
    '*c* c/evaluate
    '*python* python/evaluate
-   '*scheme* scheme/evaluate
-   })
+   '*scheme* scheme/evaluate})
 
 (defn evaluate
   "Grab the interpreter out of the execution environment, strip all

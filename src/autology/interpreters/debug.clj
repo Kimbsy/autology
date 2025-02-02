@@ -3,8 +3,9 @@
 (declare evaluate*)
 
 ;; These are the keys in the `autology.core/initial-env` map.
+;; @TODO: keep this up to date
 (def initial-env-keys
-  '(last = *debug* rest reverse get-marker conj replace-marker *c* *python* prn concat *i* nth strip-markers *scheme* drop-last list +))
+  '(* *c* *debug* *i* *python* *scheme* + = butlast concat conj first get-marker last list nth prn replace-marker rest reverse strip-markers))
 
 (defn print-locals
   [env]
