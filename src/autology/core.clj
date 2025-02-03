@@ -89,9 +89,6 @@
                                (assoc acc-env n (autology.core/evaluate v acc-env)))
                              env
                              bindings))))
-
-            ;; @TODO: need the func special form so we can write
-            ;; meaningful programs.
             
             ;; default to function application
             (:atl/function-application
