@@ -25,7 +25,49 @@ Even other non-Lisp languages are able to define some form of Domain Specific La
 
 # What can you do with it?
 
+Well to start with you might like to add functions to the language. Autology doesn't have them by default, but we can rebind the `*i*` symbol to a data structure representing a new interpreter function, one that does have functions.
 
+```Clojure
+(bind (;; grab a copy of the `:atl/eval-list` section of the
+       ;; interpreter which is responsible for evaluating lists.
+       original (get-marker *i* :atl/eval-list)
+
+       ;; define a case body for use when the list expression starts
+       ;; with our function special form, in this case `λ`.
+       λ-form (qu (let [[_λ params body] e]
+                    (fn [& values]
+                      (autology.core/evaluate
+                       body
+                       (reduce (fn [acc-env [s v]]
+                                 (assoc acc-env s v))
+                               env
+                               (zipmap params values))))))
+
+       ;; rebind `*i*` to be a new interpreter with the
+       ;; `:atl/eval-list` section replaced with a version that
+       ;; includes our lambda handling special form.
+       *i* (replace-marker *i* :atl/eval-list
+                           (list :atl/eval-list
+                                 (concat (butlast original)
+                                         (list (qu λ)
+                                               λ-form)
+                                         (list (last original)))))
+
+       ;; We can now immediately define functions since the
+       ;; interpreter will have already been updated to evaluate the
+       ;; remaining bindings like this one.
+       double (λ (n)
+                 (+ n n)))
+
+      ;; Finally we can invoke our new function!
+      (double (double (double (double (double 1.3125))))))
+```
+
+After that, pretty much anything you want!
+
+- Why not switch form applicative order evaluation to normal order evaluation?
+- Maybe modify the language so it uses a continuation passing style?
+- Define a metacircular Lisp inside your program which has access to it's own interpreter as well at the Autology interpreter.
 
 # Run tests
 
