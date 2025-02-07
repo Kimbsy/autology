@@ -32,16 +32,16 @@ Well to start with you might like to add functions to the language. Autology doe
        ;; interpreter which is responsible for evaluating lists.
        original (get-marker *i* :atl/eval-list)
 
-       ;; define a case body for use when the list expression starts
-       ;; with our function special form, in this case `λ`.
-       λ-form (qu (let [[_λ params body] e]
-                    (fn [& values]
-                      (autology.core/evaluate
-                       body
-                       (reduce (fn [acc-env [s v]]
-                                 (assoc acc-env s v))
-                               env
-                               (zipmap params values))))))
+       ;; define a case test+body for use when the list expression
+       ;; starts with our function special form, in this case `λ`.
+       λ-form (qu (λ (let [[_λ params body] e]
+                       (fn [& values]
+                         (autology.core/evaluate
+                          body
+                          (reduce (fn [acc-env [s v]]
+                                    (assoc acc-env s v))
+                                  env
+                                  (zipmap params values)))))))
 
        ;; rebind `*i*` to be a new interpreter with the
        ;; `:atl/eval-list` section replaced with a version that
@@ -49,8 +49,7 @@ Well to start with you might like to add functions to the language. Autology doe
        *i* (replace-marker *i* :atl/eval-list
                            (list :atl/eval-list
                                  (concat (butlast original)
-                                         (list (qu λ)
-                                               λ-form)
+                                         λ-form
                                          (list (last original)))))
 
        ;; We can now immediately define functions since the
