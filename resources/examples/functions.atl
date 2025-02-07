@@ -1,19 +1,18 @@
 ;; Adding functions to the language
 
 (bind (original (get-marker *i* :atl/eval-list)
-       λ-form (qu (let [[_λ params body] e]
-                    (fn [& values]
-                      (autology.core/evaluate
-                       body
-                       (reduce (fn [acc-env [s v]]
-                                 (assoc acc-env s v))
-                               env
-                               (zipmap params values))))))
+       λ-form (qu (λ (let [[_λ params body] e]
+                       (fn [& values]
+                         (autology.core/evaluate
+                          body
+                          (reduce (fn [acc-env [s v]]
+                                    (assoc acc-env s v))
+                                  env
+                                  (zipmap params values)))))))
        *i* (replace-marker *i* :atl/eval-list
                            (list :atl/eval-list
                                  (concat (butlast original)
-                                         (list (qu λ)
-                                               λ-form)
+                                         λ-form
                                          (list (last original)))))
        double (λ (n)
                  (+ n n)))
