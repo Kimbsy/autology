@@ -3,6 +3,10 @@
 A hot take on Lisp metaprogramming, `Autology` is a Lisp with access
 to its own interpreter.
 
+I'm giving a free online talk about this project for London Clojurians
+on 2025-05-13:
+[https://www.meetup.com/london-clojurians/events/306843409/](https://www.meetup.com/london-clojurians/events/306843409/)
+
 # What is it?
 
 Autology is a functional interpreted Lisp language, written in Clojure.
