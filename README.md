@@ -27,6 +27,30 @@ Macros are the normal tool for Lisp languages to modify their syntax or behaviou
 
 Even other non-Lisp languages are able to define some form of Domain Specific Language to allow programmers to express problems more clearly, however these are generally quite restrictive in scope. Autology allows full ad-hoc re-writing of the syntax of the language, as well as defining new features or removing existing ones.
 
+# Usage
+
+You can run an autology program using the `autology` script in the project root:
+
+``` Bash
+./autology foo.atl
+```
+
+There are several example programs provided to get you started:
+
+``` Bash
+./autology resources/examples/eval-order-1.atl
+
+./autology resources/examples/eval-order-2.atl
+```
+
+You can also run a REPL by passing no args:
+
+``` Bash
+./autology
+```
+
+@NOTE: the REPL could really use some work.
+
 # What can you do with it?
 
 Well to start with you might like to add functions to the language. Autology doesn't have them by default, but we can rebind the `*i*` symbol to a data structure representing a new interpreter function, one that does have functions.
