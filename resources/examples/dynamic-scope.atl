@@ -1,0 +1,17 @@
+;; Adding dynamically scoped functions to the language
+
+(bind (original (get-marker *i* :atl/eval-list)
+       λ-form (qu (λ (let [[_λ params body] e]
+                       (fn [& values]
+                         (autology.core/evaluate
+                          body
+                          (merge env (zipmap params values)))))))
+       *i* (replace-marker *i* :atl/eval-list
+                           (list :atl/eval-list
+                                 (concat (butlast original)
+                                         λ-form
+                                         (list (last original)))))
+       x 10
+       plus-x (λ (n)
+                 (+ n x)))
+      (plus-x 2))
