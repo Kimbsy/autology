@@ -1,0 +1,15 @@
+;; Modifying Autology from within the Python interpreter
+
+(with-*i* *python*
+
+  print(*i*)
+
+  *i*.insert(2, qu((prn e)))
+
+  print(*i*)
+
+  import numpy as np
+
+  arr = np.array([6, 7])
+  return np.prod(arr)
+  )
