@@ -3,8 +3,11 @@
 A hot take on Lisp metaprogramming, `Autology` is a Lisp with access
 to its own interpreter.
 
-I gave a talk about this project with London Clojurians on 2025-05-13, the recording is available here:
-[Autology: Writing a self-rewriting Lisp (YouTube)](https://www.youtube.com/watch?v=ptN53mef_IY)
+I gave a talk about this project with London Clojurians (2025-05-13):
+[Autology: Writing a self-rewriting Lisp - London Clojurians (YouTube)](https://www.youtube.com/watch?v=ptN53mef_IY)
+
+I also gave a shorter version of the same talk at Lmabda Days in Krakow (2025-06-13):
+[Autology: Writing a self-rewriting Lisp - Lambda Days (YouTube)](https://www.youtube.com/watch?v=-cppTsLgVbI)
 
 # What is it?
 
