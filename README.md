@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=Kimbsy&project=autology&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # Autology
 
 A hot take on Lisp metaprogramming, `Autology` is a Lisp with access
